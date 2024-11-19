@@ -3,47 +3,43 @@ type type = boolean | number;
 type ParsedArgs = { [key: string]: type };
 
 export default class ArgsParser {
+
     parsedArgs: ParsedArgs
     constructor(public schema: Schema) {
         this.parsedArgs = {}
     }
-    parse(args: String[]) {
-        //  const parsedArgs: ParsedArgs = {};
 
-        for (let i = 0; i < args.length; i++) {
-            const arg = args[i];
-        
-            if (arg.startsWith("-") && arg.length >= 2) {
-                const a = arg.split(' ')
-                const flag = a[0][1];
-        
-              // Verificar si la bandera está definida en el esquema
-              if (this.schema[flag] === "boolean") {
+    parse(argsText: String) {
+        const args = argsText.split('-').filter(a => a !== '')
+        //  const parsedArgs: ParsedArgs = {};
+        if (args.length === 0) throw new Error('Invalid argument')
+        for (const arg of args) {
+            const a = arg.split(' ')
+            const flag = a[0];
+
+            // Verificar si la bandera está definida en el esquema
+            if (this.schema[flag] === "boolean") {
                 this.parsedArgs[flag] = true;
-              } else if(this.schema[flag] === "number"){
+            } else if (this.schema[flag] === "number") {
                 const num = Number.parseInt(a[1])
                 this.parsedArgs[flag] = num
-              } else {
-                throw new Error(`Unknown flag: -${flag}`);
-              }
-
-              
-
             } else {
-              throw new Error(`Invalid argument: ${arg}`);
+                throw new Error(`Unknown flag: -${flag}`);
             }
-          }
-        
-          // Rellenar valores predeterminados para banderas faltantes
-           for (const key in this.schema) {
+
+
+        }
+
+        // Rellenar valores predeterminados para banderas faltantes
+        for (const key in this.schema) {
             if (!(key in this.parsedArgs)) {
                 if (this.schema[key] === "boolean") this.parsedArgs[key] = false;
-                else if(this.schema[key] === "number") this.parsedArgs[key] = 0;
-                  
-               // Por defecto, las banderas booleanas son false
+                else if (this.schema[key] === "number") this.parsedArgs[key] = 0;
+
+                // Por defecto, las banderas booleanas son false
             }
-          } 
-        
+        }
+
 
         //this.parsedArgs = 
         return this.parsedArgs
